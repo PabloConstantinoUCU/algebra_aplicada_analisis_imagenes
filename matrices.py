@@ -49,6 +49,15 @@ def mostrar_imagen(imagen_bgr, factor_ampliacion):
   cv2.waitKey(0)
   cv2.destroyAllWindows()
 
+def mostrar_imagen_rgb(imagen, factor_ampliacion):
+  alto, ancho, canales = imagen.shape
+  nueva_ancho = ancho * factor_ampliacion
+  nueva_alto = alto * factor_ampliacion
+  imagen_redimensionada = cv2.resize(imagen, (nueva_ancho, nueva_alto), interpolation=cv2.INTER_NEAREST)
+  cv2.imshow('Imagen Color', imagen_redimensionada)
+  cv2.waitKey(0)
+  cv2.destroyAllWindows()
+
 def separar_canales_rgb(imagen_bgr):
     imagen_rgb = cv2.cvtColor(imagen_bgr, cv2.COLOR_BGR2RGB)
     canal_rojo = imagen_rgb[:, :, 0]
@@ -100,6 +109,25 @@ def ajustar_contraste(imagen, alpha):
     
     return imagen_ajustada
 
+def generar_w(alto, ancho):
+    identidad = np.eye(alto) 
+    W = np.fliplr(identidad) 
+    return W
+
+def voltear_imagen(imagen, W):
+    imagen_2d = convertir_a_2d(escala_grises(imagen)) 
+    imagen_volteada = np.dot(W, imagen_2d) 
+    imagen_volteada = np.clip(imagen_volteada, 0, 255).astype(np.uint8)
+    return imagen_volteada
+
+def calcular_negativo(imagen):
+    # Crear la matriz auxiliar de 255 del mismo tamaño que la imagen
+    matriz_auxiliar = np.full(imagen.shape, 255, dtype=np.uint8)
+
+    # Calcular el negativo restando la imagen de la matriz auxiliar
+    negativo_imagen = matriz_auxiliar - imagen
+    
+    return negativo_imagen
 
 redimensionar_y_recortar_central("img/fiera.png", "img_procesadas/fiera.png")
 imagen_1 = imread("img_procesadas/fiera.png")
@@ -112,11 +140,15 @@ imagen_1_traspuesta = calcular_traspuesta(imagen_1)
 mostrar_imagen(imagen_1, 1)
 mostrar_imagen(imagen_1_traspuesta, 1)
 imagen_1_grises = escala_grises(imagen_1)
+#print(imagen_1_grises)
 mostrar_imagen(imagen_1_grises, 1)
 print(inversa(convertir_a_2d(imagen_1_grises)))
 alpha_1 = 1.5
 imagen_contraste_aumentado = ajustar_contraste(imagen_1_grises, alpha_1)
 mostrar_imagen(imagen_contraste_aumentado, 1)
-  
-# print(imagen_1_traspuesta, "\n", imagen_1.shape)
-# Notamos que se invierte la imagen (espejo) y se gira 90 grados en sentido antihorario
+w = generar_w(500,500)
+imagen_volteada = voltear_imagen(imagen_1_grises, w)
+imagen_volteada_3d = convertir_a_3d(imagen_volteada)
+mostrar_imagen_rgb(imagen_volteada_3d, 1)
+imagen_negativo = calcular_negativo(imagen_1_grises)
+mostrar_imagen_rgb(imagen_negativo, 1)
