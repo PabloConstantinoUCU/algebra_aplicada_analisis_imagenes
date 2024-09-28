@@ -92,6 +92,14 @@ def convertir_a_3d(matriz_2d):
     matriz_3d = np.stack((matriz_2d, matriz_2d, matriz_2d), axis=-1)
     return matriz_3d
 
+def ajustar_contraste(imagen, alpha):
+    imagen_ajustada = alpha * imagen
+    
+    # Asegurar que los valores estén en el rango [0, 255]
+    imagen_ajustada = np.clip(imagen_ajustada, 0, 255).astype(np.uint8)
+    
+    return imagen_ajustada
+
 
 redimensionar_y_recortar_central("img/fiera.png", "img_procesadas/fiera.png")
 imagen_1 = imread("img_procesadas/fiera.png")
@@ -106,12 +114,9 @@ mostrar_imagen(imagen_1_traspuesta, 1)
 imagen_1_grises = escala_grises(imagen_1)
 mostrar_imagen(imagen_1_grises, 1)
 print(inversa(convertir_a_2d(imagen_1_grises)))
-# imagen_2_traspuesta = calcular_traspuesta(imagen_2)
-# mostrar_imagen(imagen_2, 1)
-# mostrar_imagen(imagen_2_traspuesta, 1)
-# imagen_3_traspuesta = calcular_traspuesta(imagen_3)
-# mostrar_imagen(imagen_3, 1)
-# mostrar_imagen(imagen_3_traspuesta, 1)
+alpha_1 = 1.5
+imagen_contraste_aumentado = ajustar_contraste(imagen_1_grises, alpha_1)
+mostrar_imagen(imagen_contraste_aumentado, 1)
   
 # print(imagen_1_traspuesta, "\n", imagen_1.shape)
 # Notamos que se invierte la imagen (espejo) y se gira 90 grados en sentido antihorario
