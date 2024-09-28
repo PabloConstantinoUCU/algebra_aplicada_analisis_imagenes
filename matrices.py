@@ -11,25 +11,25 @@ def redimensionar_y_recortar_central(ruta_img: str, ruta_img_salida: str) -> Non
         alto, ancho, _ = imagen.shape
 
         # Para redimensionar la imagen, se achica para que la dimension mas pequeña sea igual a mil (ancho/alto)
-        # Luego, se recorta la otra dimension para que sea igual a 1000 pixeles
+        # Luego, se recorta la otra dimension para que sea igual a 500 pixeles
         if ancho > alto:
-            factor_escala = 1000 / alto
+            factor_escala = 500 / alto
             nuevo_ancho = int(ancho * factor_escala)
-            nuevo_alto = 1000
+            nuevo_alto = 500
         else:
-            factor_escala = 1000 / ancho
+            factor_escala = 500 / ancho
             nuevo_alto = int(alto * factor_escala)
-            nuevo_ancho = 1000
+            nuevo_ancho = 500
 
         # Redimensionar la imagen
         imagen_redimensionada = cv2.resize(imagen, (nuevo_ancho, nuevo_alto), interpolation=cv2.INTER_LINEAR)
 
-        # Recortar la imagen centralmente para obtener 1000x1000
+        # Recortar la imagen centralmente para obtener 500x500
         alto_redim, ancho_redim, _ = imagen_redimensionada.shape
         # Se obtienen estos dos valores para que la imagen resultante sea el centro de la imagen y lo 
-        x_inicial = (ancho_redim - 1000) // 2
-        y_inicial = (alto_redim - 1000) // 2
-        imagen_central = imagen_redimensionada[y_inicial:y_inicial+1000, x_inicial:x_inicial+1000]
+        x_inicial = (ancho_redim - 500) // 2
+        y_inicial = (alto_redim - 500) // 2
+        imagen_central = imagen_redimensionada[y_inicial:y_inicial+500, x_inicial:x_inicial+500]
 
         # Guardar la imagen recortada
         cv2.imwrite(ruta_img_salida, imagen_central)
@@ -92,35 +92,6 @@ def convertir_a_3d(matriz_2d):
     matriz_3d = np.stack((matriz_2d, matriz_2d, matriz_2d), axis=-1)
     return matriz_3d
 
-def inversa(matriz):
-    if len(matriz.shape) == 2:
-        try:
-            det = np.linalg.det(matriz)
-            if det == 0:
-                print("La matriz no tiene inversa porque su determinante es cero.")
-                return None
-            else:
-                inversa = np.linalg.inv(matriz)
-                return inversa
-        except np.linalg.LinAlgError as e:
-            print(f"Error al calcular la inversa: {str(e)}")
-            return None
-    else:
-        print("La matriz no es 2D.")
-        return None
-    
-def procesar_inversa_imagen(imagen_grises):
-    imagen_2d = convertir_a_2d(imagen_grises)
-    
-    inversa_imagen = inversa(imagen_2d)
-    
-    if inversa_imagen is not None:
-        print("Inversa calculada correctamente.")
-        imagen_inversa_3d = convertir_a_3d(inversa_imagen)
-        mostrar_imagen(imagen_inversa_3d, 1)
-    else:
-        print("No se pudo calcular la inversa de la imagen.")
-
 
 redimensionar_y_recortar_central("img/fiera.png", "img_procesadas/fiera.png")
 imagen_1 = imread("img_procesadas/fiera.png")
@@ -134,7 +105,7 @@ mostrar_imagen(imagen_1, 1)
 mostrar_imagen(imagen_1_traspuesta, 1)
 imagen_1_grises = escala_grises(imagen_1)
 mostrar_imagen(imagen_1_grises, 1)
-mostrar_imagen(convertir_a_3d(inversa(convertir_a_2d(imagen_1_grises))), 1)
+print(inversa(convertir_a_2d(imagen_1_grises)))
 # imagen_2_traspuesta = calcular_traspuesta(imagen_2)
 # mostrar_imagen(imagen_2, 1)
 # mostrar_imagen(imagen_2_traspuesta, 1)
@@ -142,5 +113,5 @@ mostrar_imagen(convertir_a_3d(inversa(convertir_a_2d(imagen_1_grises))), 1)
 # mostrar_imagen(imagen_3, 1)
 # mostrar_imagen(imagen_3_traspuesta, 1)
   
-print(imagen_1_traspuesta, "\n", imagen_1.shape)
+# print(imagen_1_traspuesta, "\n", imagen_1.shape)
 # Notamos que se invierte la imagen (espejo) y se gira 90 grados en sentido antihorario
